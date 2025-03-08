@@ -1,6 +1,7 @@
 package com.kotlinspring.course_catalogue_service.controller
 
 import com.kotlinspring.course_catalogue_service.dto.CourseDto
+import com.kotlinspring.course_catalogue_service.dto.toCourseEntity
 import com.kotlinspring.course_catalogue_service.entity.CourseEntity
 import com.kotlinspring.course_catalogue_service.repository.CourseRepository
 import org.junit.jupiter.api.Assertions
@@ -23,7 +24,7 @@ class CourseControllerIntTest {
     lateinit var courseRepository: CourseRepository
 
     @BeforeEach
-    fun setUp(){
+    fun setUp() {
         courseRepository.deleteAll()
         courseRepository.saveAll(courseEntityList())
     }
@@ -57,6 +58,38 @@ class CourseControllerIntTest {
                 .responseBody
 
         Assertions.assertEquals(3, results?.size)
+    }
+
+    @Test
+    fun updateCourse() {
+        val course = CourseDto(id = null, name = "someCourse", category = "someCategory")
+        val savedCourse = courseRepository.save(course.toCourseEntity())
+
+        val updatedCourse = CourseDto(id = null, name = "updatedCourseName", category = "updatedCategory")
+        val result =
+            webTestClient.put()
+                .uri("/v1/courses/{id}", savedCourse.id)
+                .bodyValue(updatedCourse)
+                .exchange()
+                .expectStatus().isOk
+                .expectBody(CourseDto::class.java)
+                .returnResult()
+                .responseBody
+
+        Assertions.assertEquals(4, result?.id)
+        Assertions.assertEquals(updatedCourse.name, result?.name)
+        Assertions.assertEquals(updatedCourse.category, result?.category)
+    }
+
+    @Test
+    fun deleteCourse() {
+        val course = CourseDto(id = null, name = "someCourse", category = "someCategory")
+        val savedCourse = courseRepository.save(course.toCourseEntity())
+
+        webTestClient.delete()
+            .uri("/v1/courses/{id}", savedCourse.id)
+            .exchange()
+            .expectStatus().isNoContent
     }
 }
 
