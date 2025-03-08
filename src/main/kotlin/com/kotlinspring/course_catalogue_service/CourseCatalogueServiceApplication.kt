@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class CourseCatalogueServiceApplication
 
 fun main(args: Array<String>) {
-	runApplication<CourseCatalogueServiceApplication>(*args)
+    runApplication<CourseCatalogueServiceApplication>(*args)
 }

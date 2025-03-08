@@ -21,12 +21,12 @@ class CourseService(
             .toCourseDto()
     }
 
-    fun retrieveCourses() : List<CourseDto> {
+    fun retrieveCourses(): List<CourseDto> {
         return courseRepository.findAll()
-            .map {it.toCourseDto()}
+            .map { it.toCourseDto() }
     }
 
-    fun updateCourse(id: Int, courseDto: CourseDto) : CourseDto {
+    fun updateCourse(id: Int, courseDto: CourseDto): CourseDto {
         val foundCourse = courseRepository.findById(id)
         return if (foundCourse.isPresent) {
             foundCourse.get()

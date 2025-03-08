@@ -21,12 +21,12 @@ class CourseController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun addCourse(@RequestBody courseDto: CourseDto) : CourseDto {
+    fun addCourse(@RequestBody courseDto: CourseDto): CourseDto {
         return courseService.addCourse(courseDto)
     }
 
     @GetMapping
-    fun retrieveCourses() : List<CourseDto> {
+    fun retrieveCourses(): List<CourseDto> {
         return courseService.retrieveCourses()
     }
 
