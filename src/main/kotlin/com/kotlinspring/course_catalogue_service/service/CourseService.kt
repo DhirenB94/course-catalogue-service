@@ -21,8 +21,12 @@ class CourseService(
             .toCourseDto()
     }
 
-    fun retrieveCourses(): List<CourseDto> {
-        return courseRepository.findAll()
+    fun retrieveCourses(name: String?): List<CourseDto> {
+       val courses =  name?.let {
+            courseRepository.findByNameContaining(name)
+        } ?: courseRepository.findAll()
+
+        return courses
             .map { it.toCourseDto() }
     }
 

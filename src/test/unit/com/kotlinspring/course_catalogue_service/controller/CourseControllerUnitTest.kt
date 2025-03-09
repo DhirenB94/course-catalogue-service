@@ -30,7 +30,7 @@ class CourseControllerUnitTest {
         val course1 = CourseDto(null, "1", "1")
         val course2 = CourseDto(null, "2", "2")
 
-        every { courseControllerMock.retrieveCourses() } returns listOf(course1, course2)
+        every { courseControllerMock.retrieveCourses(any()) } returns listOf(course1, course2)
 
         val results = webTestClient.get()
             .uri("/v1/courses")
