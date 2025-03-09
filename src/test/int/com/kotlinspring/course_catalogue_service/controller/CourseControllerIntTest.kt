@@ -108,5 +108,5 @@ fun courseEntityList() = listOf(
         null,
         "nameThree",
         "categoryThree"
-    )
+    ),
 )
