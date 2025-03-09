@@ -63,6 +63,43 @@ class CourseControllerUnitTest {
     }
 
     @Test
+    fun addCourseValidation() {
+        val course = CourseDto(null, "", "category")
+        every { courseControllerMock.addCourse(course) } returns course
+
+        val result = webTestClient.post()
+            .uri("/v1/courses")
+            .bodyValue(course)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody(String::class.java)
+            .returnResult()
+            .responseBody
+
+        Assertions.assertEquals("courseDto name must not be blank", result)
+    }
+
+    @Test
+    fun addCourseRuntimeExcpetion() {
+        val course = CourseDto(null, "name", "category")
+
+        val errorMessage = "unexpected error occurred"
+
+        every { courseControllerMock.addCourse(course) } throws RuntimeException(errorMessage)
+
+        val result = webTestClient.post()
+            .uri("/v1/courses")
+            .bodyValue(course)
+            .exchange()
+            .expectStatus().is5xxServerError
+            .expectBody(String::class.java)
+            .returnResult()
+            .responseBody
+
+        Assertions.assertEquals(errorMessage, result)
+    }
+
+    @Test
     fun updateCourseExists() {
         val course = CourseDto(1, "1", "1")
         val updatedCourse = CourseDto(1, "100", "100")
