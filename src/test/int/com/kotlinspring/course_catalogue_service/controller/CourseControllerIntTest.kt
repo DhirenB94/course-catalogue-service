@@ -1,9 +1,10 @@
 package com.kotlinspring.course_catalogue_service.controller
 
 import com.kotlinspring.course_catalogue_service.dto.CourseDto
-import com.kotlinspring.course_catalogue_service.dto.toCourseEntity
 import com.kotlinspring.course_catalogue_service.entity.CourseEntity
+import com.kotlinspring.course_catalogue_service.entity.Instructor
 import com.kotlinspring.course_catalogue_service.repository.CourseRepository
+import com.kotlinspring.course_catalogue_service.repository.InstructorRepository
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,15 +25,22 @@ class CourseControllerIntTest {
     @Autowired
     lateinit var courseRepository: CourseRepository
 
+    @Autowired
+    lateinit var instructorRepository: InstructorRepository
+
     @BeforeEach
     fun setUp() {
         courseRepository.deleteAll()
-        courseRepository.saveAll(courseEntityList())
+        instructorRepository.deleteAll()
+        val instructor = instructorEntity()
+        instructorRepository.save(instructor)
+        courseRepository.saveAll(courseEntityList(instructor))
     }
 
     @Test
     fun addCourse() {
-        val courseDto = CourseDto(id = null, name = "hello", category = "action")
+        val instructor = instructorRepository.findAll().first()
+        val courseDto = CourseDto(id = null, name = "hello", category = "action", instructor.id)
 
         val result =
             webTestClient.post()
@@ -81,10 +89,12 @@ class CourseControllerIntTest {
 
     @Test
     fun updateCourse() {
-        val course = CourseDto(id = null, name = "someCourse", category = "someCategory")
-        val savedCourse = courseRepository.save(course.toCourseEntity())
+        val instructor = instructorRepository.findAll().first()
+        val course = CourseEntity(id = null, name = "someCourse", category = "someCategory", instructor)
+        val savedCourse = courseRepository.save(course)
 
-        val updatedCourse = CourseDto(id = null, name = "updatedCourseName", category = "updatedCategory")
+        val updatedCourse =
+            CourseDto(id = null, name = "updatedCourseName", category = "updatedCategory", instructor.id)
         val result =
             webTestClient.put()
                 .uri("/v1/courses/{id}", savedCourse.id)
@@ -102,8 +112,9 @@ class CourseControllerIntTest {
 
     @Test
     fun deleteCourse() {
-        val course = CourseDto(id = null, name = "someCourse", category = "someCategory")
-        val savedCourse = courseRepository.save(course.toCourseEntity())
+        val instructor = instructorRepository.findAll().first()
+        val course = CourseEntity(id = null, name = "someCourse", category = "someCategory", instructor)
+        val savedCourse = courseRepository.save(course)
 
         webTestClient.delete()
             .uri("/v1/courses/{id}", savedCourse.id)
@@ -112,20 +123,25 @@ class CourseControllerIntTest {
     }
 }
 
-fun courseEntityList() = listOf(
+fun courseEntityList(instructor: Instructor? = null) = listOf(
     CourseEntity(
         null,
         "nameOne",
-        "categoryOne"
+        "categoryOne",
+        instructor
     ),
     CourseEntity(
         null,
         "nameTwo",
-        "categoryTwo"
+        "categoryTwo",
+        instructor
     ),
     CourseEntity(
         null,
         "nameThree",
-        "categoryThree"
+        "categoryThree",
+        instructor
     ),
 )
+
+fun instructorEntity(name: String = "hsshhs") = Instructor(null, name)
