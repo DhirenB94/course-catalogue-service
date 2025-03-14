@@ -1,6 +1,8 @@
 package com.kotlinspring.course_catalogue_service.repository
 
 import com.kotlinspring.course_catalogue_service.controller.courseEntityList
+import com.kotlinspring.course_catalogue_service.controller.instructorEntity
+import com.kotlinspring.course_catalogue_service.util.PostgreSQLContainerInitialiser
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -8,21 +10,29 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ActiveProfiles
 import java.util.stream.Stream
 
 @DataJpaTest
 @ActiveProfiles("test")
-class CourseRepositoryIntTest {
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+class CourseRepositoryIntTest : PostgreSQLContainerInitialiser() {
 
     @Autowired
     lateinit var courseRepository: CourseRepository
 
+    @Autowired
+    lateinit var instructorRepository: InstructorRepository
+
     @BeforeEach
     fun setUp() {
         courseRepository.deleteAll()
-        courseRepository.saveAll(courseEntityList())
+        instructorRepository.deleteAll()
+        val instructor = instructorEntity()
+        instructorRepository.save(instructor)
+        courseRepository.saveAll(courseEntityList(instructor))
     }
 
     @Test
